@@ -10,31 +10,46 @@ class AbstractInterface(metaclass=ABCMeta):
         return cls.instance
 
     @abstractmethod
-    def get_event(self):
+    def update(self):
+        pass
+
+    @abstractmethod
+    def set_display(self, size, is_full_screen):
+        pass
+
+    @abstractmethod
+    def load_image(self, filename):
+        pass
+
+    @staticmethod
+    @abstractmethod
+    def blit(screen, image):
         pass
 
     def wait(self, milliseconds):
         sleep(milliseconds)
 
     @abstractmethod
-    def get_event_type(self, event):
-        pass
+    class Event:
+        @staticmethod
+        @abstractmethod
+        def get_event():
+            pass
 
-    @abstractmethod
-    def update(self):
-        pass
+        @staticmethod
+        @abstractmethod
+        def get_event_type(event):
+            pass
 
-    @abstractmethod
-    def set_screen(self, size, is_full_screen):
-        pass
+        @staticmethod
+        @abstractmethod
+        def get_pressed_keys():
+            pass
 
-    @abstractmethod
-    def get_pressed_keys(self):
-        pass
-
-    @abstractmethod
-    def get_key(self, event):
-        pass
+        @staticmethod
+        @abstractmethod
+        def get_key(event):
+            pass
 
     @abstractmethod
     class Sprite:
@@ -57,4 +72,30 @@ class AbstractInterface(metaclass=ABCMeta):
 
     @abstractmethod
     class Image:
-        pass
+        @abstractmethod
+        def set_image(self, img):
+            pass
+
+        @abstractmethod
+        def move_rect(self, shift):
+            pass
+
+        @abstractmethod
+        def set_rect(self, left):
+            pass
+
+        @abstractmethod
+        def subsurface(self, rect):
+            pass
+
+        @abstractmethod
+        def get_size(self):
+            pass
+
+        @abstractmethod
+        def scale(self, new_size):
+            pass
+
+        @abstractmethod
+        def merge(self, image):
+            pass

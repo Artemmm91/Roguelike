@@ -1,5 +1,4 @@
 from graphics.interface import interface
-from setting_files import settings
 
 
 class Mob(interface.Sprite):
@@ -9,9 +8,10 @@ class Mob(interface.Sprite):
         self.image = interface.Image()
         self.frames = frames
         self.current_frame = 0
+        self.animation = None
 
     def set_coord(self, coord):
-        self.coord = [coord[0] * settings.cell_size, coord[1] * settings.cell_size]
+        self.coord = [coord[0], coord[1]]
 
     def shift_coord(self, shift):
         self.coord[0] += shift[0]
@@ -22,3 +22,7 @@ class Mob(interface.Sprite):
             self.current_frame = 0
         self.image.set_image(self.frames[self.current_frame])
         self.current_frame += 1
+
+    def draw(self, display):
+        self.image.set_rect((self.coord[0] - display.camera[0], self.coord[1] - display.camera[1]))
+        interface.blit(display.screen, self.image)

@@ -13,11 +13,16 @@ class MainGame(Process):
         self.map = None
         self.hero = Hero()
         self.hero_acted = False
+        self.sprites = self.interface.GroupSprite()
+        self.sprites.add(self.hero)
 
     def new_level(self):
         self.map = generate_map()
+        self.map.spawn_monsters()
         self.map.render_map()
         self.hero.set_coord(self.map.hero_coord)
+        for monster in self.map.monsters.values():
+            self.sprites.add(monster)
 
     def main_loop(self):
         """ Main loop of program - processing each tick/frame of game """
@@ -30,17 +35,19 @@ class MainGame(Process):
 
     def process_events(self):
         """ Processing all events - clicking buttons - and respectively moving objects by commands """
-        events = self.interface.get_event()
+        events = self.interface.Event.get_event()
         for event in events:
-            event_type = self.interface.get_event_type(event)
+            event_type = self.interface.Event.get_event_type(event)
             if event_type == settings.quit_flag:
                 self.window_close = True
             if event_type == settings.keydown_flag:
-                event_key = self.interface.get_key(event)
+                event_key = self.interface.Event.get_key(event)
                 if event_key == settings.escape_key:
                     self.display.fullscreen()
                 if not self.hero.animation:
                     self.hero_acted = self.hero.act(event_key, self.map)
+                else:
+                    print("walking")
 
     def game_logic(self):
         """ Automatic move of objects/units/monsters, checking collisions, and other game logic """
@@ -50,11 +57,11 @@ class MainGame(Process):
 
     def draw(self):
         """ Drawing all objects to the window """
-        self.display.screen_fill(settings.BLACK)
+        self.display.screen_fill(settings.colors["BLACK"])
 
-        self.hero.update(self.display)
+        self.sprites.update(self.display)
         self.map.update(self.display)
 
         self.map.draw(self.display)
-        self.display.draw(self.hero)
+        self.sprites.draw(self.display)
         self.display.update()

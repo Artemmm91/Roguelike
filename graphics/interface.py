@@ -7,6 +7,8 @@ class InterfacePyGame(AbstractInterface):
     def __init__(self):
         pygame.init()
         pygame.font.init()
+        self.event = self.Event()
+
         self.flags = {
             pygame.KEYDOWN: settings.keydown_flag,
             pygame.QUIT: settings.quit_flag,
@@ -20,32 +22,50 @@ class InterfacePyGame(AbstractInterface):
             pygame.K_RIGHT: settings.right_key,
         }
 
-    def get_event(self):
-        return pygame.event.get()
-
     def wait(self, milliseconds):
         pygame.time.wait(milliseconds)
-
-    def get_event_type(self, event):
-        if event.type in self.flags:
-            return self.flags[event.type]
-        return None
 
     def update(self):
         pygame.display.update()
 
-    def set_screen(self, size, is_full_screen):
+    def set_display(self, size, is_full_screen):
         if is_full_screen:
             return pygame.display.set_mode(size, pygame.FULLSCREEN)
         return pygame.display.set_mode(size)
 
-    def get_key(self, event):
-        if event.key in self.keys:
-            return self.keys[event.key]
-        return None
+    class Event:
+        flags = {
+            pygame.KEYDOWN: settings.keydown_flag,
+            pygame.QUIT: settings.quit_flag,
+        }
 
-    def get_pressed_keys(self):
-        return pygame.key.get_pressed()
+        keys = {
+            pygame.K_ESCAPE: settings.escape_key,
+            pygame.K_DOWN: settings.down_key,
+            pygame.K_UP: settings.up_key,
+            pygame.K_LEFT: settings.left_key,
+            pygame.K_RIGHT: settings.right_key,
+        }
+
+        @staticmethod
+        def get_event():
+            return pygame.event.get()
+
+        @staticmethod
+        def get_event_type(event):
+            if event.type in InterfacePyGame.Event.flags:
+                return InterfacePyGame.Event.flags[event.type]
+            return None
+
+        @staticmethod
+        def get_key(event):
+            if event.key in InterfacePyGame.Event.keys:
+                return InterfacePyGame.Event.keys[event.key]
+            return None
+
+        @staticmethod
+        def get_pressed_keys():
+            return pygame.key.get_pressed()
 
     class Sprite(pygame.sprite.Sprite):
         def __init__(self):
@@ -55,7 +75,7 @@ class InterfacePyGame(AbstractInterface):
         def __init__(self, image=None, size=(50, 50)):
             if not image:
                 self.image = pygame.Surface(size)
-                self.image.fill(settings.BLACK)
+                self.image.fill(settings.colors["BLACK"])
             else:
                 self.image = image
             self.rect = self.image.get_rect()
@@ -85,6 +105,10 @@ class InterfacePyGame(AbstractInterface):
 
     def load_image(self, filename):
         return self.Image(pygame.image.load("resources/images/" + filename))
+
+    @staticmethod
+    def blit(screen, image):
+        screen.blit(image.image, image.rect)
 
 
 interface = InterfacePyGame()

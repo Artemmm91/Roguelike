@@ -21,11 +21,14 @@ def make_list_frames(frames, repeat):
 
     return new_frames
 
+
 class Resources(object):
     def __init__(self):
         self.wall_tiles = load_atlas("Wall.png", 16, 16)
         self.floor_tiles = load_atlas("Floor.png", 16, 16)
-        self.player = [load_atlas("Player0.png", 16, 16), load_atlas("Player1.png", 16, 16)]
+        self.player = [load_atlas("Player0.png", 16, 16), load_atlas("Player1.png", 16, 16),
+                       load_atlas("Player0rev.png", 16, 16), load_atlas("Player1rev.png", 16, 16),]
+        self.monsters = [load_atlas("Demon0.png", 16, 16), load_atlas("Demon1.png", 16, 16),]
 
     def __new__(cls):
         if not hasattr(cls, 'instance'):
@@ -37,7 +40,7 @@ resources = Resources()
 
 
 class Design(object):
-    def __init__(self, wall_set, floor_set, player_set):
+    def __init__(self, wall_set, floor_set, player_set, monster_set):
         x, y = floor_set
         self.floors = {
             "corner1": resources.floor_tiles[x][y],          # corner |'
@@ -71,12 +74,26 @@ class Design(object):
 
         x, y = player_set
         player_frames = [resources.player[0][x][y], resources.player[1][x][y]]
-        self.player = make_list_frames(player_frames, 8)
+        player_rev_frames = [resources.player[2][x][7 - y], resources.player[3][x][7 - y]]
+        self.player = {settings.left_key: make_list_frames(player_frames, settings.frame_tick),
+                       settings.right_key: make_list_frames(player_rev_frames, settings.frame_tick)}
 
-    def __new__(cls, wall_set, floor_set, player_set):
+        self.monsters = {}
+        for monster_type in monster_set:
+            self.monsters[monster_type] = []
+            for design in monster_set[monster_type]:
+                x, y = design
+                monster_frames = [resources.monsters[0][x][y], resources.monsters[1][x][y]]
+                self.monsters[monster_type].append(make_list_frames(monster_frames, settings.frame_tick))
+
+    def __new__(cls, wall_set, floor_set, player_set, monster_set):
         if not hasattr(cls, 'instance'):
             cls.instance = super(Design, cls).__new__(cls)
         return cls.instance
 
 
-data = Design((6, 0), (6, 0), (3, 3))
+monster_design = {
+    "demon": ((3, 2), (1, 3), (1, 2), (1, 0))
+}
+
+data = Design((6, 0), (6, 0), (3, 3), monster_design)

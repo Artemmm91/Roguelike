@@ -1,7 +1,9 @@
+from random import choice
 from setting_files import settings
 from graphics.interface import interface
 from resources.resources import data
 from setting_files import block_names
+from mobs.monsters import Demon
 
 
 def keys_in_dict(keys, dictionary):
@@ -11,11 +13,16 @@ def keys_in_dict(keys, dictionary):
     return True
 
 
+MONSTERS = [Demon]
+
+
 class Map:
-    def __init__(self, map_coord, hero_coord):
+    def __init__(self, map_coord, hero_coord, monster_coord):
         self.table = map_coord
         self.table_size = (len(self.table), len(self.table[0]))
         self.hero_coord = hero_coord
+        self.monster_coord = monster_coord
+        self.monsters = {}
         self.rendered_map = None
         self.image = None
 
@@ -56,7 +63,7 @@ class Map:
             for x in range(self.table_size[1]):
                 cell_type = settings.map_symbols[self.table[y][x]]
                 cell = interface.Image(image=None, size=(settings.cell_size, settings.cell_size))
-                if cell_type == "floor":
+                if cell_type == "floor" or cell_type == "monster":
                     cell = data.floors[self.type_floor((y, x))]
                 elif cell_type == "wall":
                     cell = data.walls[self.type_wall((y, x))]
@@ -66,3 +73,20 @@ class Map:
 
     def draw(self, display):
         display.draw_image(self.image)
+
+    def place_monster(self, monster, coord):
+        if monster.coord:
+            del self.monsters[monster.coord]
+        if coord is None:
+            coord = monster.coord
+        if not coord:
+            raise ValueError("Specify position.")
+        if coord in self.monsters:
+            raise KeyError("Already occupied.")
+        monster.set_coord(coord)
+        self.monsters[coord] = monster
+
+    def spawn_monsters(self):
+        for monster_pos in self.monster_coord:
+            current_monster = choice(MONSTERS)
+            self.place_monster(current_monster(), monster_pos)
