@@ -2,7 +2,7 @@ from graphics.interface import interface
 from setting_files import settings
 
 
-def load_atlas(filename, width, height):
+def load_atlas(filename, width=16, height=16):
     image = interface.load_image(filename)
     image_width, image_height = image.get_size()
     return [
@@ -24,11 +24,11 @@ def make_list_frames(frames, repeat):
 
 class Resources(object):
     def __init__(self):
-        self.wall_tiles = load_atlas("Wall.png", 16, 16)
-        self.floor_tiles = load_atlas("Floor.png", 16, 16)
-        self.player = [load_atlas("Player0.png", 16, 16), load_atlas("Player1.png", 16, 16),
-                       load_atlas("Player0rev.png", 16, 16), load_atlas("Player1rev.png", 16, 16),]
-        self.monsters = [load_atlas("Demon0.png", 16, 16), load_atlas("Demon1.png", 16, 16),]
+        self.wall_tiles = load_atlas("Wall.png")
+        self.floor_tiles = load_atlas("Floor.png")
+        self.player = [load_atlas("Player0.png"), load_atlas("Player1.png"),
+                       load_atlas("Player0rev.png"), load_atlas("Player1rev.png")]
+        self.monsters = [load_atlas("Demon0.png"), load_atlas("Demon1.png")]
 
     def __new__(cls):
         if not hasattr(cls, 'instance'):
@@ -72,11 +72,24 @@ class Design(object):
             "edge3": resources.wall_tiles[x][y + 1],        # ___
         }
 
+        self.player = {}
         x, y = player_set
-        player_frames = [resources.player[0][x][y], resources.player[1][x][y]]
-        player_rev_frames = [resources.player[2][x][7 - y], resources.player[3][x][7 - y]]
-        self.player = {settings.left_key: make_list_frames(player_frames, settings.frame_tick),
-                       settings.right_key: make_list_frames(player_rev_frames, settings.frame_tick)}
+        direction_images = {
+            0: (x, y),
+            2: (x, 7 - y)
+        }
+        direction_keys = {
+            0: settings.left_key,
+            2: settings.right_key
+        }
+        for direction in direction_images:
+            x, y = direction_images[direction]
+            hero_frames = [resources.player[direction][x][y], resources.player[direction + 1][x][y]]
+            hero_still = make_list_frames(hero_frames, settings.frame_tick)
+            self.player[direction_keys[direction]] = {
+                "still": hero_still,
+                "walk": hero_still,
+            }
 
         self.monsters = {}
         for monster_type in monster_set:
@@ -84,7 +97,11 @@ class Design(object):
             for design in monster_set[monster_type]:
                 x, y = design
                 monster_frames = [resources.monsters[0][x][y], resources.monsters[1][x][y]]
-                self.monsters[monster_type].append(make_list_frames(monster_frames, settings.frame_tick))
+                monsters_still = make_list_frames(monster_frames, settings.frame_tick)
+                self.monsters[monster_type].append({
+                    "still": monsters_still,
+                    "walk": monsters_still,
+                })
 
     def __new__(cls, wall_set, floor_set, player_set, monster_set):
         if not hasattr(cls, 'instance'):
@@ -96,4 +113,4 @@ monster_design = {
     "demon": ((3, 2), (1, 3), (1, 2), (1, 0))
 }
 
-data = Design((6, 0), (6, 0), (3, 3), monster_design)
+data = Design(wall_set=(9, 0), floor_set=(9, 0), player_set=(3, 3), monster_set=monster_design)

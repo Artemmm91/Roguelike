@@ -1,5 +1,5 @@
 from map.table_map import Map
-from setting_files import settings
+from setting_files.utils import cartesian_coord
 
 
 def read_map(filename):
@@ -17,11 +17,11 @@ def read_map(filename):
             if symbol == "#":
                 new_line.append(1)
             elif symbol == "h":
-                new_line.append(0)
-                hero_pos = [(j + 1) * settings.cell_size, (i + 1) * settings.cell_size]
-            elif symbol == "m":
                 new_line.append(2)
-                monsters_pos.append(((j + 1) * settings.cell_size, (i + 1) * settings.cell_size))
+                hero_pos = list(cartesian_coord((j + 1, i + 1)))
+            elif symbol == "m":
+                new_line.append(3)
+                monsters_pos.append(cartesian_coord((j + 1, i + 1)))
             elif symbol == " ":
                 new_line.append(9)
             elif symbol == "_":

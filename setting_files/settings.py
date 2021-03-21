@@ -36,5 +36,6 @@ map_symbols = {
     9: "empty",
     0: "floor",
     1: "wall",
-    2: "monster",
+    2: "hero",
+    3: "monster",
 }

@@ -1,7 +1,6 @@
 from game_files.abstract_process import Process
 from setting_files import settings
 from map.map_generator import generate_map
-from mobs.hero import Hero
 from display.display import Display
 
 
@@ -11,17 +10,16 @@ class MainGame(Process):
         self.window_close = False
         self.display = Display(self.interface)
         self.map = None
-        self.hero = Hero()
         self.hero_acted = False
         self.sprites = self.interface.GroupSprite()
-        self.sprites.add(self.hero)
 
     def new_level(self):
         self.map = generate_map()
         self.map.spawn_monsters()
+        self.map.spawn_hero()
         self.map.render_map()
-        self.hero.set_coord(self.map.hero_coord)
-        for monster in self.map.monsters.values():
+
+        for monster in self.map.mobs.values():
             self.sprites.add(monster)
 
     def main_loop(self):
@@ -32,6 +30,14 @@ class MainGame(Process):
             self.game_logic()
             self.draw()
             self.interface.wait(settings.frame_wait)
+
+    def is_animation(self):
+        if self.map.hero.animation:
+            return True
+        for m in self.map.mobs.values():
+            if m.animation:
+                return True
+        return False
 
     def process_events(self):
         """ Processing all events - clicking buttons - and respectively moving objects by commands """
@@ -44,14 +50,16 @@ class MainGame(Process):
                 event_key = self.interface.Event.get_key(event)
                 if event_key == settings.escape_key:
                     self.display.fullscreen()
-                if not self.hero.animation:
-                    self.hero_acted = self.hero.act(event_key, self.map)
-                else:
-                    print("walking")
+                if not self.is_animation():
+                    self.hero_acted = self.map.hero.act(event_key, self.map)
 
     def game_logic(self):
         """ Automatic move of objects/units/monsters, checking collisions, and other game logic """
-        if not self.hero.animation and self.hero_acted:
+        if not self.is_animation() and self.hero_acted:
+            current_monsters = list(self.map.mobs.values())
+            for monster in current_monsters:
+                if monster != self.map.hero:
+                    monster.act(self.map)
             # monsters turn
             self.hero_acted = False
 
