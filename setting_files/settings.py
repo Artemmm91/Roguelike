@@ -4,12 +4,12 @@ FULLSCREEN_DEFAULT = False
 hero_hp = 100
 monster_hp = 20
 
-cell_size = 64
+cell_size = 48
 
-frame_tick = 8
-frame_wait = 24
-animation_wait = 2
-animation_frames = 2
+frame_tick = 16
+frame_wait = 16
+animation_frames = 8
+# for good animation needs to divide cell_size
 
 colors = {
     "BLACK": (0, 0, 0),

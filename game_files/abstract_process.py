@@ -1,9 +1,9 @@
 from abc import ABCMeta, abstractmethod
-from graphics.interface import interface as intr
+from graphics.interface import InterfacePyGame
 
 
 class Process(metaclass=ABCMeta):
-    interface = intr
+    interface = InterfacePyGame()
 
     @abstractmethod
     def main_loop(self):

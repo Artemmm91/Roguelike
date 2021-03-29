@@ -23,3 +23,8 @@ def center(window_size):
     center_screen = (window_size[0] // 2, window_size[1] // 2)
     half_side = settings.cell_size // 2
     return center_screen[0] - half_side, center_screen[1] - half_side
+
+
+def make_splitting(length, number, k):
+    required_list = [length // number] * (number - 1) + [length // number + length % number]
+    return [(k[0] * element, k[1] * element) for element in required_list]

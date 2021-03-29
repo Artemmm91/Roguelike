@@ -1,6 +1,7 @@
 import pygame
 from graphics.abstract_interface import AbstractInterface
 from setting_files import settings
+import os
 
 
 class InterfacePyGame(AbstractInterface):
@@ -67,10 +68,6 @@ class InterfacePyGame(AbstractInterface):
         def get_pressed_keys():
             return pygame.key.get_pressed()
 
-    class Sprite(pygame.sprite.Sprite):
-        def __init__(self):
-            super().__init__()
-
     class Image:
         def __init__(self, image=None, size=(50, 50)):
             if not image:
@@ -104,11 +101,8 @@ class InterfacePyGame(AbstractInterface):
             self.image.blit(image.image, image.rect)
 
     def load_image(self, filename):
-        return self.Image(pygame.image.load("resources/images/" + filename))
+        return self.Image(pygame.image.load(os.path.join("resources", "images", filename)))
 
     @staticmethod
     def blit(screen, image):
         screen.blit(image.image, image.rect)
-
-
-interface = InterfacePyGame()

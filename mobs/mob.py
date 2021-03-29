@@ -1,18 +1,18 @@
-from graphics.interface import interface
-from setting_files.utils import shift_coord
+from graphics.interface import InterfacePyGame
+from setting_files.utils import shift_coord, make_splitting
 from setting_files import settings
 
 
-class Mob(interface.Sprite):
+class Mob:
     def __init__(self, frames):
         super().__init__()
         self.coord = None
         self.image_coord = None
-        self.image = interface.Image()
+        self.image = InterfacePyGame.Image()
         self.frames = frames
         self.current_frame = 0
         self.animation = None
-        self.last_image_shift = (0, 0)
+        self.target_coord = None
 
     def set_coord(self, coord):
         self.coord = [coord[0], coord[1]]
@@ -28,18 +28,24 @@ class Mob(interface.Sprite):
 
     def set_animation(self, animation):
         self.animation = animation
-        self.current_frame = 0
+        # self.current_frame = 0  # while there is no walk animation
 
     def draw(self, display):
         self.image.set_rect(shift_coord(self.image_coord, display.camera, -1))
-        interface.blit(display.screen, self.image)
+        InterfacePyGame().blit(display.screen, self.image)
 
     def walk_animation(self, direction):
-        for frame in range(settings.animation_frames):
-            for step in range(settings.animation_wait):
-                yield
-            if direction is not None:
-                coefficient = settings.cell_size // settings.animation_frames
-                self.last_image_shift = (coefficient * direction[0], coefficient * direction[1])
-                self.move_image(shift_coord(self.image_coord, self.last_image_shift))
+        shift_list = make_splitting(settings.cell_size, settings.animation_frames, direction)
+        for shift in shift_list:
+            yield
+            self.move_image(shift_coord(self.image_coord, shift))
             self.set_image("walk")
+
+    def update(self, display):
+        if self.animation:
+            try:
+                next(self.animation)
+            except StopIteration:
+                self.set_animation(None)
+        else:
+            self.set_image()

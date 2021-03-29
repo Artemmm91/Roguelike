@@ -1,6 +1,6 @@
 from random import choice
 from setting_files import settings
-from graphics.interface import interface
+from graphics.interface import InterfacePyGame
 from resources.resources import data
 from setting_files import block_names
 from setting_files.utils import cartesian_coord, map_coord
@@ -61,11 +61,11 @@ class Map:
 
     def render_map(self):
         map_size = cartesian_coord(self.table_size, True)
-        self.rendered_map = interface.Image(image=None, size=map_size)
+        self.rendered_map = InterfacePyGame.Image(image=None, size=map_size)
         for y in range(self.table_size[0]):
             for x in range(self.table_size[1]):
                 cell_type = settings.map_symbols[self.table[y][x]]
-                cell = interface.Image(image=None, size=(settings.cell_size, settings.cell_size))
+                cell = InterfacePyGame.Image(image=None, size=(settings.cell_size, settings.cell_size))
                 if cell_type in ["floor", "monster", "hero"]:
                     cell = data.floors[self.type_floor((y, x))]
                 elif cell_type == "wall":

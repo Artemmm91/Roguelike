@@ -51,10 +51,6 @@ class AbstractInterface(metaclass=ABCMeta):
         def get_key(event):
             pass
 
-    @abstractmethod
-    class Sprite:
-        pass
-
     class GroupSprite:
         def __init__(self):
             self.list = []

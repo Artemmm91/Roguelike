@@ -1,13 +1,16 @@
-from graphics.interface import interface
+from graphics.interface import InterfacePyGame
 from setting_files import settings
+from setting_files.file_names import *
 
 
 def load_atlas(filename, width=16, height=16):
-    image = interface.load_image(filename)
+    image = InterfacePyGame().load_image(filename)
     image_width, image_height = image.get_size()
     return [
         [
-            (image.subsurface((x * width, y * height, width, height))).scale((settings.cell_size, settings.cell_size))
+            (image.subsurface((x * width, y * height, width, height))).scale(
+                (settings.cell_size, settings.cell_size)
+            )
             for x in range(image_width // width)
         ]
         for y in range(image_height // height)
@@ -24,11 +27,10 @@ def make_list_frames(frames, repeat):
 
 class Resources(object):
     def __init__(self):
-        self.wall_tiles = load_atlas("Wall.png")
-        self.floor_tiles = load_atlas("Floor.png")
-        self.player = [load_atlas("Player0.png"), load_atlas("Player1.png"),
-                       load_atlas("Player0rev.png"), load_atlas("Player1rev.png")]
-        self.monsters = [load_atlas("Demon0.png"), load_atlas("Demon1.png")]
+        self.wall_tiles = load_atlas(wall_file)
+        self.floor_tiles = load_atlas(floor_file)
+        self.player = [load_atlas(file) for file in player_files]
+        self.monsters = [load_atlas(file) for file in monster_files]
 
     def __new__(cls):
         if not hasattr(cls, 'instance'):
@@ -36,12 +38,11 @@ class Resources(object):
         return cls.instance
 
 
-resources = Resources()
-
-
 class Design(object):
+
     def __init__(self, wall_set, floor_set, player_set, monster_set):
         x, y = floor_set
+        resources = Resources()
         self.floors = {
             "corner1": resources.floor_tiles[x][y],          # corner |'
             "corner2": resources.floor_tiles[x][y + 2],      # corner '|

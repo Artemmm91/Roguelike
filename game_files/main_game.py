@@ -22,6 +22,8 @@ class MainGame(Process):
         for monster in self.map.mobs.values():
             self.sprites.add(monster)
 
+        self.map.hero.center_camera(self.display)
+
     def main_loop(self):
         """ Main loop of program - processing each tick/frame of game """
         self.new_level()

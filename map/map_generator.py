@@ -8,12 +8,10 @@ def read_map(filename):
     max_length = 0
     hero_pos = None
     monsters_pos = []
-    i = 0
-    for line in field:
+    for i, line in enumerate(field):
         new_line = [9]
         max_length = max(max_length, len(line))
-        j = 0
-        for symbol in line:
+        for j, symbol in enumerate(line):
             if symbol == "#":
                 new_line.append(1)
             elif symbol == "h":
