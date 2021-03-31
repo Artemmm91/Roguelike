@@ -4,6 +4,7 @@ from setting_files.file_names import *
 
 
 def load_atlas(filename, width=16, height=16):
+    """ From picture with many images make [[]] of images """
     image = InterfacePyGame().load_image(filename)
     image_width, image_height = image.get_size()
     return [
@@ -18,6 +19,7 @@ def load_atlas(filename, width=16, height=16):
 
 
 def make_list_frames(frames, repeat):
+    """ making frame list with repeat """
     new_frames = []
     for frame in frames:
         new_frames.extend([frame] * repeat)
@@ -26,11 +28,14 @@ def make_list_frames(frames, repeat):
 
 
 class Resources(object):
+    """ CLass of atlas images """
     def __init__(self):
         self.wall_tiles = load_atlas(wall_file)
         self.floor_tiles = load_atlas(floor_file)
         self.player = [load_atlas(file) for file in player_files]
         self.monsters = [load_atlas(file) for file in monster_files]
+        self.doors = [load_atlas(file) for file in door_files]
+        self.swipe = load_atlas(swipe_file)
 
     def __new__(cls):
         if not hasattr(cls, 'instance'):
@@ -39,8 +44,8 @@ class Resources(object):
 
 
 class Design(object):
-
-    def __init__(self, wall_set, floor_set, player_set, monster_set):
+    """ CLass with certain design of images """
+    def __init__(self, wall_set, floor_set, player_set, monster_set, door_set):
         x, y = floor_set
         resources = Resources()
         self.floors = {
@@ -104,7 +109,22 @@ class Design(object):
                     "walk": monsters_still,
                 })
 
-    def __new__(cls, wall_set, floor_set, player_set, monster_set):
+        x, y = door_set
+        door_open_frames = [resources.doors[0][x][y], resources.doors[1][x][y]]
+        door_close_frames = [resources.doors[0][x][y + 1], resources.doors[1][x][y + 1]]
+        self.door = {
+            "open": make_list_frames(door_open_frames, settings.frame_tick),
+            "close": make_list_frames(door_close_frames, settings.frame_tick),
+        }
+
+        self.swipe = {
+            (1, 0): [frame for frame in resources.swipe[0]],
+            (0, 1): [frame for frame in resources.swipe[1]],
+            (-1, 0): [frame for frame in resources.swipe[2]],
+            (0, -1): [frame for frame in resources.swipe[3]],
+        }
+
+    def __new__(cls, wall_set, floor_set, player_set, monster_set, door_set):
         if not hasattr(cls, 'instance'):
             cls.instance = super(Design, cls).__new__(cls)
         return cls.instance
@@ -114,4 +134,5 @@ monster_design = {
     "demon": ((3, 2), (1, 3), (1, 2), (1, 0))
 }
 
-data = Design(wall_set=(9, 0), floor_set=(9, 0), player_set=(3, 3), monster_set=monster_design)
+data = Design(wall_set=(9, 0), floor_set=(9, 0),
+              player_set=(3, 3), monster_set=monster_design, door_set=(5, 1))

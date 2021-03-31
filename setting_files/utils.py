@@ -28,3 +28,7 @@ def center(window_size):
 def make_splitting(length, number, k):
     required_list = [length // number] * (number - 1) + [length // number + length % number]
     return [(k[0] * element, k[1] * element) for element in required_list]
+
+
+def distance(coord1, coord2, p=2):
+    return ((abs(coord1[0] - coord2[0])**p + abs(coord1[1] - coord2[1]) ** p) ** (1 / p)) / settings.cell_size

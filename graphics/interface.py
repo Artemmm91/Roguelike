@@ -1,6 +1,8 @@
+from abc import ABCMeta
 import pygame
 from graphics.abstract_interface import AbstractInterface
 from setting_files import settings
+from setting_files.utils import shift_coord
 import os
 
 
@@ -21,6 +23,10 @@ class InterfacePyGame(AbstractInterface):
             pygame.K_UP: settings.up_key,
             pygame.K_LEFT: settings.left_key,
             pygame.K_RIGHT: settings.right_key,
+            pygame.K_a: settings.a_key,
+            pygame.K_s: settings.s_key,
+            pygame.K_d: settings.d_key,
+            pygame.K_w: settings.w_key,
         }
 
     def wait(self, milliseconds):
@@ -46,6 +52,10 @@ class InterfacePyGame(AbstractInterface):
             pygame.K_UP: settings.up_key,
             pygame.K_LEFT: settings.left_key,
             pygame.K_RIGHT: settings.right_key,
+            pygame.K_a: settings.a_key,
+            pygame.K_s: settings.s_key,
+            pygame.K_d: settings.d_key,
+            pygame.K_w: settings.w_key,
         }
 
         @staticmethod
@@ -100,9 +110,38 @@ class InterfacePyGame(AbstractInterface):
         def merge(self, image):
             self.image.blit(image.image, image.rect)
 
+        def set_alpha(self, alpha):
+            self.image.set_alpha(alpha)
+
     def load_image(self, filename):
         return self.Image(pygame.image.load(os.path.join("resources", "images", filename)))
 
     @staticmethod
     def blit(screen, image):
         screen.blit(image.image, image.rect)
+
+    def copy(self, another_image):
+        return self.Image(another_image.copy())
+
+    class Sprite(AbstractInterface.AbstractSprite, metaclass=ABCMeta):
+        """ Current implementation of sprites """
+        def __init__(self, frames):
+            super().__init__()
+            self.image_coord = None
+            self.image = InterfacePyGame.Image()
+            self.frames = frames
+            self.current_frame = 0
+            self.priority = 0
+
+        def move_image(self, image_coord):
+            self.image_coord = image_coord
+
+        def draw(self, display):
+            self.image.set_rect(shift_coord(self.image_coord, display.camera, -1))
+            InterfacePyGame().blit(display.screen, self.image)
+
+        def update(self, display):
+            if self.current_frame >= len(self.frames):
+                self.current_frame = 0
+            self.image.set_image(self.frames[self.current_frame])
+            self.current_frame += 1
